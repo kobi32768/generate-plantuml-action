@@ -38,7 +38,9 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
 
     const commits = await getCommitsFromPayload(octokit, payload);
     const files = updatedFiles(commits);
+    console.log('Updated files:', files);
     const plantumlCodes = retrieveCodes(files);
+    console.log('plantumlCodes:', JSON.stringify(plantumlCodes, null, 2));
 
     let tree: any[] = [];
     for (const plantumlCode of plantumlCodes) {
@@ -63,8 +65,11 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
         }).then(res => (<any>res.data).sha).catch(e => undefined);
 
         if (blobRes.data.sha !== sha) {
+            // GitHub API expects paths without leading slash
+            const normalizedPath = p.startsWith('/') ? p.substring(1) : p;
+            console.log('Adding to tree with path:', normalizedPath);
             tree = tree.concat({
-                path: p.toString(),
+                path: normalizedPath,
                 mode: "100644",
                 type: "blob",
                 sha: blobRes.data.sha
