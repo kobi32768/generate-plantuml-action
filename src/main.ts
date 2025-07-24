@@ -49,6 +49,7 @@ const octokit = new github.GitHub(process.env.GITHUB_TOKEN);
             name: plantumlCode.name,
             ext: '.svg'
         });
+        console.log(p)
 
         const svg = await generateSvg(plantumlCode.code);
         const blobRes = await octokit.git.createBlob({
